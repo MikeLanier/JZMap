@@ -16,10 +16,10 @@ class JZMap extends HBox
 {
 	private Canvas mapCanvas = null;
 	private double scale = 1.0;
-	private double cellRadius = 60;
+	private double cellRadius = 60.0;
 	private double canvasHeight = 300;
 	private double canvasWidth = 300;
-	private double canvasBorder = 10;
+	private double canvasBorder = 10.0;
 	private double cellCountX = 3;
 	private double cellCountY = 3;
 
@@ -274,13 +274,6 @@ class JZMap extends HBox
 			JZMapCell cell = cells.get(i);
 			if(cell != null)
 			{
-//				double w = cellWidth * scale;
-//				double h = cellHeight * scale;
-////				System.out.println("cellIndexMin: " + cellIndexMinX + ", " + cellIndexMinY);
-////				System.out.println("cellIndex: " + cell.xIndex() + ", " + cell.yIndex());
-//				double x = canvasBorder/2 + (cell.xIndex() - cellIndexMinX) * w;
-//				double y = canvasBorder/2 + (cell.yIndex() - cellIndexMinY) * h;
-////				System.out.println( "x, y: " + x + ", " + y);
 				cell.Update( canvasWidth/2, canvasHeight/2 ); // x, y, w, h );
 			}
 		}
@@ -371,17 +364,26 @@ class JZMap extends HBox
 
 	public void OnMouseMoved(MouseEvent value)
 	{
-		//System.out.println("OnMouseMoved");
+//		System.out.println("OnMouseMoved");
 		double x = value.getX();
 		double y = value.getY();
 
 		for(int i=0; i<cells.size(); i++)
 		{
 			JZMapCell cell = cells.get(i);
-			if(cell.isHit(x,y))
-				cell.Hovered(true);
-			else
-				cell.Hovered(false);
+			if(cell.isHit(x,y)) {
+				if(!cell.Hovered()) {
+//					System.out.println("isHit: " + cell.xIndex() + ", " + cell.yIndex());
+					cell.Hovered(true);
+					cell.Update();
+				}
+			}
+			else {
+				if(cell.Hovered()) {
+					cell.Hovered(false);
+					cell.Update();
+				}
+			}
 		}
 	}
 

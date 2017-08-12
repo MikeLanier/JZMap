@@ -106,6 +106,11 @@ class JZMapCell
 		}
 	}
 
+	Boolean Hovered()
+	{
+		return _bHovered;
+	}
+
 	void Hovered(Boolean hovered)
 	{
 		if(_bHovered != hovered)
@@ -137,17 +142,23 @@ class JZMapCell
 		_xIndex = xIndex;
 		_yIndex = yIndex;
 		_radius = 60;
-		int xCenter = _radius * xIndex;
-		int yCenter = _radius * yIndex;
+		int xCenter = _radius * _xIndex;
+		int yCenter = _radius * _yIndex;
 		boolean octagon = (xIndex & 1) != 0 ? false : true;
 
 		_polygon = new JZMapPolygon( _radius, xCenter, yCenter, octagon );
 		m_parent = parent;
 	}
 
+	static double _mapCenterX = 0;
+	static double _mapCenterY = 0;
 	Boolean isHit(double x, double y)
 	{
-		return _polygon.isPtInRect(x,y);
+		double xt = x-_mapCenterX;
+		double yt = y-_mapCenterY;
+//		System.out.println(_polygon);
+//		System.out.println("isHit(" + xIndex() + ", " + yIndex() + ") : " + xt + ", " + yt);
+		return _polygon.isPtInRect(x-_mapCenterX,y-_mapCenterY);
 	}
 
 	private void UpdatePaths(GraphicsContext gc, JZMapPolygon range)
@@ -194,90 +205,67 @@ class JZMapCell
 		}
 	}
 
-//	void Update(int xIndex, int yIndex) {
-//		if (m_parent != null) {
-//			double width = m_parent.getWidth();
-//			double height = m_parent.getHeight();
-//
-//			double xCenter = width / 2;
-//			double yCenter = height / 2;
-//
-//			double xOrigin = xCenter - _cellWidth / 2 + xIndex * _cellWidth;
-//			double yOrigin = yCenter - _cellHeight / 2 + yIndex * _cellHeight;
-//
-//			Update( xOrigin, yOrigin, _cellWidth, _cellHeight );
-//		}
-//	}
-
-	private void Update()
+	void Update()
 	{
-		Update( 0, 0 );
+		Update( _mapCenterX, _mapCenterY );
 	}
 
 	void Update( double mapCenterX, double mapCenterY )
 	{
 		System.out.println("JZMapCell::Update");
-//		System.out.println("Update: " + xOrigin + ", " + yOrigin + ", " + width + ", " + height);
+		_mapCenterX = mapCenterX;
+		_mapCenterY = mapCenterX;
+
+		GraphicsContext gc = m_parent.getGraphicsContext2D();
+		gc.setFill(Color.AQUA);
+//
+//		if(_type == Type.room)
 //		{
-//			_cellWidth = width;
-//			_cellHeight = height;
+//			gc.setLineDashes(0);
+//			gc.setLineWidth(2);
 //
-//			_range = new JZMapPolygon(new JZMapPoint(xOrigin,yOrigin), new JZMapSize(_cellWidth,_cellHeight));
+//			int offset = 20;
+//			gc.setFill(Color.GREEN);
+//			gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
 //
-			GraphicsContext gc = m_parent.getGraphicsContext2D();
-			gc.setFill(Color.AQUA);
+//			UpdatePaths(gc,_range);
 //
-//			if(_type == Type.room)
-//			{
-//				gc.setLineDashes(0);
-//				gc.setLineWidth(2);
+//			gc.setFill(Color.WHITE);
+//			gc.setStroke(Color.BLACK);
+//			gc.fillRect(xOrigin+offset,yOrigin+offset,_cellWidth-offset*2,_cellHeight-offset*2);
+//			gc.strokeRect(xOrigin+offset,yOrigin+offset,_cellWidth-offset*2,_cellHeight-offset*2);
+//		}
 //
-//				int offset = 20;
-//				gc.setFill(Color.GREEN);
-//				gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
+//		else if(_type == Type.path)
+//		{
+//			gc.setLineDashes(0);
+//			gc.setFill(Color.GREEN);
+//			gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
 //
-//				UpdatePaths(gc,_range);
+//			UpdatePaths(gc,_range);
+//		}
 //
-//				gc.setFill(Color.WHITE);
-//				gc.setStroke(Color.BLACK);
-//				gc.fillRect(xOrigin+offset,yOrigin+offset,_cellWidth-offset*2,_cellHeight-offset*2);
-//				gc.strokeRect(xOrigin+offset,yOrigin+offset,_cellWidth-offset*2,_cellHeight-offset*2);
-//			}
-//
-//			else if(_type == Type.path)
-//			{
-//				gc.setLineDashes(0);
-//				gc.setFill(Color.GREEN);
-//				gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
-//
-//				UpdatePaths(gc,_range);
-//			}
-//
-//			else
-//			{
-				if(_bSelected)
-					gc.setStroke(Color.RED);
-				else if(_bHovered)
-					gc.setStroke(Color.ORANGE);
-				else
-					gc.setStroke(Color.BLACK);
+//		else
+//		{
+			if(_bSelected)
+				gc.setStroke(Color.RED);
+			else if(_bHovered)
+				gc.setStroke(Color.ORANGE);
+			else
+				gc.setStroke(Color.BLACK);
 
-				gc.setLineDashes(6, 6);
-				gc.setLineWidth(1);
+			gc.setLineDashes(6, 6);
+			gc.setLineWidth(1);
 
-				int n = _polygon._border.npoints;
-				double[] xpoints = new double[9];
-				double[] ypoints = new double[9];
-				for(int i=0; i<n; i++) {
-					xpoints[i] = mapCenterX + (double)_polygon._border.xpoints[i];
-					ypoints[i] = mapCenterY + (double)_polygon._border.ypoints[i];
-				}
+			int n = _polygon._border.npoints;
+			double[] xpoints = new double[9];
+			double[] ypoints = new double[9];
+			for(int i=0; i<n; i++) {
+				xpoints[i] = mapCenterX + (double)_polygon._border.xpoints[i];
+				ypoints[i] = mapCenterY + (double)_polygon._border.ypoints[i];
+			}
 
-				gc.strokePolygon( xpoints, ypoints, n );
-
-//
-//				gc.strokeRoundRect(xOrigin + 10, yOrigin + 10, _cellWidth - 20, _cellHeight - 20, 5, 5);
-//			}
+			gc.strokePolygon( xpoints, ypoints, n );
 //		}
 	}
 

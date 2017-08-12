@@ -1,12 +1,6 @@
-import javafx.scene.shape.Polyline;
-
-import java.awt.*;
-import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
-
 public class JZMapPolygon
 {
-	static java.awt.Polygon _frame = new java.awt.Polygon();
+	java.awt.Polygon _frame = new java.awt.Polygon();
 	java.awt.Polygon _border = new java.awt.Polygon();
 	static java.awt.Polygon _room = new java.awt.Polygon();
 
@@ -58,12 +52,17 @@ public class JZMapPolygon
 
 	public String toString()
 	{
-		String s = "_frame, _border, _room"; //left + ", " + top + ", " + right + ", " + bottom;
+		String s = "_frame: ";
+		int n = _frame.npoints;
+		for(int i=0; i<n; i++) {
+			s = s + "[" + _frame.xpoints[i] + ", " + _frame.ypoints[i] + "] \n";
+		}
 		return s;
 	}
 
 	public Boolean isPtInRect(double x, double y)
 	{
+//		System.out.println("isPtInRect: " + x + ", " + y);
 		return _frame.contains(x, y);
 	}
 }
