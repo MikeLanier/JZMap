@@ -91,8 +91,8 @@ class JZMapCell
 
 	void copy(JZMapCell c)
 	{
-		_xIndex = c._xIndex;
-		_yIndex = c._yIndex;
+//		_xIndex = c._xIndex;
+//		_yIndex = c._yIndex;
 		_radius = c._radius;
 		_type = c._type;
 		int xCenter = _radius * _xIndex;
@@ -138,7 +138,7 @@ class JZMapCell
 
 	JZMapCell(Canvas parent, int xIndex, int yIndex)
 	{
-		System.out.println("JZMapCell");
+//		System.out.println("JZMapCell");
 		_xIndex = xIndex;
 		_yIndex = yIndex;
 		_radius = 60;
@@ -212,41 +212,59 @@ class JZMapCell
 
 	void Update( double mapCenterX, double mapCenterY )
 	{
-		System.out.println("JZMapCell::Update");
+//		System.out.println("JZMapCell::Update");
 		_mapCenterX = mapCenterX;
 		_mapCenterY = mapCenterX;
 
 		GraphicsContext gc = m_parent.getGraphicsContext2D();
 		gc.setFill(Color.AQUA);
-//
-//		if(_type == Type.room)
-//		{
-//			gc.setLineDashes(0);
-//			gc.setLineWidth(2);
-//
-//			int offset = 20;
-//			gc.setFill(Color.GREEN);
+
+		if(_type == Type.room)
+		{
+			gc.setLineDashes(0);
+			gc.setLineWidth(2);
+
+			int offset = 20;
+			gc.setFill(Color.GREEN);
 //			gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
-//
+
 //			UpdatePaths(gc,_range);
-//
-//			gc.setFill(Color.WHITE);
-//			gc.setStroke(Color.BLACK);
+
+			gc.setFill(Color.WHITE);
+			gc.setStroke(Color.BLACK);
 //			gc.fillRect(xOrigin+offset,yOrigin+offset,_cellWidth-offset*2,_cellHeight-offset*2);
 //			gc.strokeRect(xOrigin+offset,yOrigin+offset,_cellWidth-offset*2,_cellHeight-offset*2);
-//		}
-//
-//		else if(_type == Type.path)
-//		{
-//			gc.setLineDashes(0);
-//			gc.setFill(Color.GREEN);
-//			gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
-//
+			int n = _polygon._frame.npoints;
+			double[] xpoints = new double[9];
+			double[] ypoints = new double[9];
+			for(int i=0; i<n; i++) {
+				xpoints[i] = mapCenterX + (double)_polygon._frame.xpoints[i];
+				ypoints[i] = mapCenterY + (double)_polygon._frame.ypoints[i];
+			}
+
+			gc.fillPolygon( xpoints, ypoints, n );
+		}
+
+		else if(_type == Type.path)
+		{
+			gc.setLineDashes(0);
+			gc.setFill(Color.GREEN);
+			//gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
+			int n = _polygon._frame.npoints;
+			double[] xpoints = new double[9];
+			double[] ypoints = new double[9];
+			for(int i=0; i<n; i++) {
+				xpoints[i] = mapCenterX + (double)_polygon._frame.xpoints[i];
+				ypoints[i] = mapCenterY + (double)_polygon._frame.ypoints[i];
+			}
+
+			gc.fillPolygon( xpoints, ypoints, n );
+
 //			UpdatePaths(gc,_range);
-//		}
-//
-//		else
-//		{
+		}
+
+		else
+		{
 			if(_bSelected)
 				gc.setStroke(Color.RED);
 			else if(_bHovered)
@@ -266,7 +284,7 @@ class JZMapCell
 			}
 
 			gc.strokePolygon( xpoints, ypoints, n );
-//		}
+		}
 	}
 
 	void save(BufferedWriter out) throws IOException

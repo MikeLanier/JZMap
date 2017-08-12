@@ -10,7 +10,7 @@ public class JZMapPolygon
 
 	private void BuildPolygon( java.awt.Polygon polygon, int radius, int xCenter, int yCenter, boolean octagon )
 	{
-		System.out.println("BuildPolygon");
+//		System.out.println("BuildPolygon");
 
 		int d = radius * 2;
 		int d3 = d / 3;
@@ -38,7 +38,7 @@ public class JZMapPolygon
 	
 	private void BuildPolygons( int radius, int xCenter, int yCenter, boolean octagon )
 	{
-		System.out.println("BuildPolygons");
+//		System.out.println("BuildPolygons");
 		BuildPolygon( _frame, radius, xCenter, yCenter, octagon );
 		BuildPolygon( _border, radius-3, xCenter, yCenter, octagon );
 		BuildPolygon( _room, radius-12, xCenter, yCenter, octagon );
@@ -46,7 +46,7 @@ public class JZMapPolygon
 
 	public JZMapPolygon(int radius, int xCenter, int yCenter, boolean octagon)
 	{
-		System.out.println("JZMapPolygon");
+//		System.out.println("JZMapPolygon");
 		BuildPolygons(radius, xCenter, yCenter, octagon);
 	}
 
