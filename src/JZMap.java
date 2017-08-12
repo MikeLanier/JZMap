@@ -16,8 +16,7 @@ class JZMap extends HBox
 {
 	private Canvas mapCanvas = null;
 	private double scale = 1.0;
-	private double cellHeight = 100;
-	private double cellWidth = 100;
+	private double cellRadius = 60;
 	private double canvasHeight = 300;
 	private double canvasWidth = 300;
 	private double canvasBorder = 10;
@@ -190,17 +189,17 @@ class JZMap extends HBox
 		mapPane.setPrefSize(width-(int)controlsWidth,height);
 		mapPane.setContent(mapCanvas);
 
-		JZMapCell cell = new JZMapCell(mapCanvas, -1, -1);	cells.add(cell);
-		cell = new JZMapCell(mapCanvas, 0, -1);			cells.add(cell);
-		cell = new JZMapCell(mapCanvas, 1, -1);			cells.add(cell);
+		JZMapCell cell = new JZMapCell(mapCanvas, -2, -2);	cells.add(cell);
+		cell = new JZMapCell(mapCanvas, 0, -2);			cells.add(cell);
+		cell = new JZMapCell(mapCanvas, 2, -2);			cells.add(cell);
 
-		cell = new JZMapCell(mapCanvas, -1, 0);			cells.add(cell);
+		cell = new JZMapCell(mapCanvas, -2, 0);			cells.add(cell);
 		cell = new JZMapCell(mapCanvas, 0, 0);				cells.add(cell);
-		cell = new JZMapCell(mapCanvas, 1, 0);				cells.add(cell);
+		cell = new JZMapCell(mapCanvas, 2, 0);				cells.add(cell);
 
-		cell = new JZMapCell(mapCanvas, -1, 1);			cells.add(cell);
-		cell = new JZMapCell(mapCanvas, 0, 1);				cells.add(cell);
-		cell = new JZMapCell(mapCanvas, 1, 1);				cells.add(cell);
+		cell = new JZMapCell(mapCanvas, -2, 2);			cells.add(cell);
+		cell = new JZMapCell(mapCanvas, 0, 2);				cells.add(cell);
+		cell = new JZMapCell(mapCanvas, 2, 2);				cells.add(cell);
 
 		GraphicsContext gc = mapCanvas.getGraphicsContext2D();
 		gc.setFill(Color.AQUA);
@@ -245,13 +244,13 @@ class JZMap extends HBox
 			if(cell.yIndex() < cellIndexMinY)	cellIndexMinY = cell.yIndex();
 		}
 
-		int cellCountX = cellIndexMaxX - cellIndexMinX + 1;
-		int cellCountY = cellIndexMaxY - cellIndexMinY + 1;
+		int cellCountX = cellIndexMaxX - cellIndexMinX + 2;
+		int cellCountY = cellIndexMaxY - cellIndexMinY + 2;
 
 		System.out.println("cellCount: " + cellCountX + ", " + cellCountY);
 
-		canvasWidth = cellWidth * cellCountX * scale + canvasBorder;
-		canvasHeight = cellHeight * cellCountY * scale + canvasBorder;
+		canvasWidth = cellRadius * cellCountX * scale + canvasBorder;
+		canvasHeight = cellRadius * cellCountY * scale + canvasBorder;
 
 		System.out.println("canvas size: " + canvasWidth + ", " + canvasHeight);
 
@@ -275,14 +274,14 @@ class JZMap extends HBox
 			JZMapCell cell = cells.get(i);
 			if(cell != null)
 			{
-				double w = cellWidth * scale;
-				double h = cellHeight * scale;
-//				System.out.println("cellIndexMin: " + cellIndexMinX + ", " + cellIndexMinY);
-//				System.out.println("cellIndex: " + cell.xIndex() + ", " + cell.yIndex());
-				double x = canvasBorder/2 + (cell.xIndex() - cellIndexMinX) * w;
-				double y = canvasBorder/2 + (cell.yIndex() - cellIndexMinY) * h;
-//				System.out.println( "x, y: " + x + ", " + y);
-				cell.Update( x, y, w, h );
+//				double w = cellWidth * scale;
+//				double h = cellHeight * scale;
+////				System.out.println("cellIndexMin: " + cellIndexMinX + ", " + cellIndexMinY);
+////				System.out.println("cellIndex: " + cell.xIndex() + ", " + cell.yIndex());
+//				double x = canvasBorder/2 + (cell.xIndex() - cellIndexMinX) * w;
+//				double y = canvasBorder/2 + (cell.yIndex() - cellIndexMinY) * h;
+////				System.out.println( "x, y: " + x + ", " + y);
+				cell.Update( canvasWidth/2, canvasHeight/2 ); // x, y, w, h );
 			}
 		}
 	}

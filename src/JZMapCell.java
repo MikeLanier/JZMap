@@ -11,6 +11,8 @@ class JZMapCell
 {
 	@SuppressWarnings("FieldCanBeLocal")
 
+	// The x/y index of the cell on the map.  The indices will be even for an octagon and odd for a diamond.
+	//    Both indices will be even or odd.  You cannot have one even and the other odd
 	private int  _xIndex;
 	private int  _yIndex;
 
@@ -38,10 +40,13 @@ class JZMapCell
 		path,
 	}
 
+	// initialize a cell as undefined.  When displayed they will be white with a dashed border
 	private Type _type = Type.undefined;
 	Type type() { return _type; }
 	void type(Type t) { _type = t; }
 
+	// defined the exits for the cell.  None to begin with.  Octagons can exit N, W, E, W, NE, NW, SE, SW,
+	// up or down. Diamonds can only exit NE, NW, SE, SW.
 	private ArrayList<Exit> exits = new ArrayList<>();
 	void ToggleExit(Exit exit, Boolean on)
 	{
@@ -64,6 +69,7 @@ class JZMapCell
 		}
 	}
 
+	// returns true if the cell as an exit in the given direction
 	Boolean hasExit(Exit exit)
 	{
 		for(Exit e: exits)
@@ -77,10 +83,8 @@ class JZMapCell
 		return false;
 	}
 
-	private JZMapRect _range = new JZMapRect();
-
-	private static double	_cellWidth = 100;
-	private static double	_cellHeight = 100;
+	private JZMapPolygon _polygon = null;
+	private static int _radius = 60;
 
 	private Boolean _bHovered = false;
 	private Boolean _bSelected = false;
@@ -89,7 +93,12 @@ class JZMapCell
 	{
 		_xIndex = c._xIndex;
 		_yIndex = c._yIndex;
+		_radius = c._radius;
 		_type = c._type;
+		int xCenter = _radius * _xIndex;
+		int yCenter = _radius * _yIndex;
+		boolean octagon = (_xIndex & 1) != 0 ? false : true;
+		_polygon = new JZMapPolygon( _radius, xCenter, yCenter, octagon );
 
 		for(int i=0; i<c.exits.size(); i++ )
 		{
@@ -102,7 +111,7 @@ class JZMapCell
 		if(_bHovered != hovered)
 		{
 			_bHovered = hovered;
-			Update();
+			//Update();
 		}
 	}
 
@@ -112,7 +121,7 @@ class JZMapCell
 		if(_bSelected != selected)
 		{
 			_bSelected = selected;
-			Update();
+			//Update();
 		}
 	}
 
@@ -120,27 +129,28 @@ class JZMapCell
 
 //	public JZMapCell()
 //	{
-//		_xIndex = 0;
-//		_yIndex = 0;
-//		m_parent = null;
 //	}
 
 	JZMapCell(Canvas parent, int xIndex, int yIndex)
 	{
-//		System.out.println("JZMapCell");
+		System.out.println("JZMapCell");
 		_xIndex = xIndex;
 		_yIndex = yIndex;
+		_radius = 60;
+		int xCenter = _radius * xIndex;
+		int yCenter = _radius * yIndex;
+		boolean octagon = (xIndex & 1) != 0 ? false : true;
+
+		_polygon = new JZMapPolygon( _radius, xCenter, yCenter, octagon );
 		m_parent = parent;
-		_cellWidth = 100;
-		_cellHeight = 100;
 	}
 
 	Boolean isHit(double x, double y)
 	{
-		return _range.isPtInRect(x,y);
+		return _polygon.isPtInRect(x,y);
 	}
 
-	private void UpdatePaths(GraphicsContext gc, JZMapRect range)
+	private void UpdatePaths(GraphicsContext gc, JZMapPolygon range)
 	{
 		gc.setLineDashes(0);
 		gc.setLineWidth(2);
@@ -149,38 +159,38 @@ class JZMapCell
 
 		for(Exit exit: exits)
 		{
-			if(exit == Exit.north)
-			{
-				gc.strokeLine(range.CenterPoint().x, range.top, range.CenterPoint().x, range.CenterPoint().y);
-			}
-			else if(exit == Exit.south)
-			{
-				gc.strokeLine(range.CenterPoint().x, range.bottom, range.CenterPoint().x, range.CenterPoint().y);
-			}
-			else if(exit == Exit.east)
-			{
-				gc.strokeLine(range.right, range.CenterPoint().y, range.CenterPoint().x, range.CenterPoint().y);
-			}
-			else if(exit == Exit.west)
-			{
-				gc.strokeLine(range.left, range.CenterPoint().y, range.CenterPoint().x, range.CenterPoint().y);
-			}
-			else if(exit == Exit.northwest)
-			{
-				gc.strokeLine(range.left, range.top, range.CenterPoint().x, range.CenterPoint().y);
-			}
-			else if(exit == Exit.northeast)
-			{
-				gc.strokeLine(range.right, range.top, range.CenterPoint().x, range.CenterPoint().y);
-			}
-			else if(exit == Exit.southwest)
-			{
-				gc.strokeLine(range.left, range.bottom, range.CenterPoint().x, range.CenterPoint().y);
-			}
-			else if(exit == Exit.southeast)
-			{
-				gc.strokeLine(range.right, range.bottom, range.CenterPoint().x, range.CenterPoint().y);
-			}
+//			if(exit == Exit.north)
+//			{
+//				gc.strokeLine(range.CenterPoint().x, range.top, range.CenterPoint().x, range.CenterPoint().y);
+//			}
+//			else if(exit == Exit.south)
+//			{
+//				gc.strokeLine(range.CenterPoint().x, range.bottom, range.CenterPoint().x, range.CenterPoint().y);
+//			}
+//			else if(exit == Exit.east)
+//			{
+//				gc.strokeLine(range.right, range.CenterPoint().y, range.CenterPoint().x, range.CenterPoint().y);
+//			}
+//			else if(exit == Exit.west)
+//			{
+//				gc.strokeLine(range.left, range.CenterPoint().y, range.CenterPoint().x, range.CenterPoint().y);
+//			}
+//			else if(exit == Exit.northwest)
+//			{
+//				gc.strokeLine(range.left, range.top, range.CenterPoint().x, range.CenterPoint().y);
+//			}
+//			else if(exit == Exit.northeast)
+//			{
+//				gc.strokeLine(range.right, range.top, range.CenterPoint().x, range.CenterPoint().y);
+//			}
+//			else if(exit == Exit.southwest)
+//			{
+//				gc.strokeLine(range.left, range.bottom, range.CenterPoint().x, range.CenterPoint().y);
+//			}
+//			else if(exit == Exit.southeast)
+//			{
+//				gc.strokeLine(range.right, range.bottom, range.CenterPoint().x, range.CenterPoint().y);
+//			}
 		}
 	}
 
@@ -201,49 +211,50 @@ class JZMapCell
 
 	private void Update()
 	{
-		Update( _range.left, _range.top, _cellWidth, _cellHeight);
+		Update( 0, 0 );
 	}
 
-	void Update( double xOrigin, double yOrigin, double width, double height )
+	void Update( double mapCenterX, double mapCenterY )
 	{
+		System.out.println("JZMapCell::Update");
 //		System.out.println("Update: " + xOrigin + ", " + yOrigin + ", " + width + ", " + height);
-		{
-			_cellWidth = width;
-			_cellHeight = height;
-
-			_range = new JZMapRect(new JZMapPoint(xOrigin,yOrigin), new JZMapSize(_cellWidth,_cellHeight));
-
+//		{
+//			_cellWidth = width;
+//			_cellHeight = height;
+//
+//			_range = new JZMapPolygon(new JZMapPoint(xOrigin,yOrigin), new JZMapSize(_cellWidth,_cellHeight));
+//
 			GraphicsContext gc = m_parent.getGraphicsContext2D();
 			gc.setFill(Color.AQUA);
-
-			if(_type == Type.room)
-			{
-				gc.setLineDashes(0);
-				gc.setLineWidth(2);
-
-				int offset = 20;
-				gc.setFill(Color.GREEN);
-				gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
-
-				UpdatePaths(gc,_range);
-
-				gc.setFill(Color.WHITE);
-				gc.setStroke(Color.BLACK);
-				gc.fillRect(xOrigin+offset,yOrigin+offset,_cellWidth-offset*2,_cellHeight-offset*2);
-				gc.strokeRect(xOrigin+offset,yOrigin+offset,_cellWidth-offset*2,_cellHeight-offset*2);
-			}
-
-			else if(_type == Type.path)
-			{
-				gc.setLineDashes(0);
-				gc.setFill(Color.GREEN);
-				gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
-
-				UpdatePaths(gc,_range);
-			}
-
-			else
-			{
+//
+//			if(_type == Type.room)
+//			{
+//				gc.setLineDashes(0);
+//				gc.setLineWidth(2);
+//
+//				int offset = 20;
+//				gc.setFill(Color.GREEN);
+//				gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
+//
+//				UpdatePaths(gc,_range);
+//
+//				gc.setFill(Color.WHITE);
+//				gc.setStroke(Color.BLACK);
+//				gc.fillRect(xOrigin+offset,yOrigin+offset,_cellWidth-offset*2,_cellHeight-offset*2);
+//				gc.strokeRect(xOrigin+offset,yOrigin+offset,_cellWidth-offset*2,_cellHeight-offset*2);
+//			}
+//
+//			else if(_type == Type.path)
+//			{
+//				gc.setLineDashes(0);
+//				gc.setFill(Color.GREEN);
+//				gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
+//
+//				UpdatePaths(gc,_range);
+//			}
+//
+//			else
+//			{
 				if(_bSelected)
 					gc.setStroke(Color.RED);
 				else if(_bHovered)
@@ -254,9 +265,20 @@ class JZMapCell
 				gc.setLineDashes(6, 6);
 				gc.setLineWidth(1);
 
-				gc.strokeRoundRect(xOrigin + 10, yOrigin + 10, _cellWidth - 20, _cellHeight - 20, 5, 5);
-			}
-		}
+				int n = _polygon._border.npoints;
+				double[] xpoints = new double[9];
+				double[] ypoints = new double[9];
+				for(int i=0; i<n; i++) {
+					xpoints[i] = mapCenterX + (double)_polygon._border.xpoints[i];
+					ypoints[i] = mapCenterY + (double)_polygon._border.ypoints[i];
+				}
+
+				gc.strokePolygon( xpoints, ypoints, n );
+
+//
+//				gc.strokeRoundRect(xOrigin + 10, yOrigin + 10, _cellWidth - 20, _cellHeight - 20, 5, 5);
+//			}
+//		}
 	}
 
 	void save(BufferedWriter out) throws IOException

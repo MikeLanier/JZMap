@@ -1,3 +1,10 @@
+// TODO   [ ] Convert Cells to Octagons and Diamonds
+// TODO       [ ] Octagons can be paths or rooms
+// TODO       [ ] Diamonds are paths only. They fill in gaps which are NE, NW, SE and SW of an octagon
+// TODO       [ ] Rather than origin, width, and height. A cell will be defined by center and radius.
+// TODO           [ ] Radius of a diamond will be 1/3 the radius of an octagon
+// TODO       [ ] The x/y index of a cell will be even for octagons and odd for diamonds
+// TODO       [ ] When a path is defined in/out NE, NW, SE, and/or SW of an octagon, the neighbor path in will be given a path in the same direction
 // TODO   [-] Zoom In/Out
 // TODO       [x] Buttons for zoom +/-
 // TODO       [ ] Zoom using scroll wheel
