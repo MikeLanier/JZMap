@@ -201,6 +201,8 @@ class JZMap extends HBox
 		cell = new JZMapCell(mapCanvas, 0, 2);				cells.add(cell);
 		cell = new JZMapCell(mapCanvas, 2, 2);				cells.add(cell);
 
+		cell = new JZMapCell(mapCanvas, -1, -1);			cells.add(cell);
+
 		GraphicsContext gc = mapCanvas.getGraphicsContext2D();
 		gc.setFill(Color.AQUA);
 		gc.setStroke(Color.MAGENTA);

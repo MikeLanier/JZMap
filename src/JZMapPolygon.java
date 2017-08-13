@@ -2,7 +2,7 @@ public class JZMapPolygon
 {
 	java.awt.Polygon _frame = new java.awt.Polygon();
 	java.awt.Polygon _border = new java.awt.Polygon();
-	static java.awt.Polygon _room = new java.awt.Polygon();
+	java.awt.Polygon _room = new java.awt.Polygon();
 
 	public JZMapPolygon()
 	{
@@ -28,11 +28,11 @@ public class JZMapPolygon
 			polygon.addPoint(xCenter - d6, yCenter - radius);
 		}
 		else {
-			polygon.addPoint(xCenter, yCenter - radius);
-			polygon.addPoint(xCenter + radius, yCenter);
-			polygon.addPoint(xCenter, yCenter + radius);
-			polygon.addPoint(xCenter - radius, yCenter);
-			polygon.addPoint(xCenter, yCenter - radius);
+			polygon.addPoint(xCenter, yCenter - d3);
+			polygon.addPoint(xCenter + d3, yCenter);
+			polygon.addPoint(xCenter, yCenter + d3);
+			polygon.addPoint(xCenter - d3, yCenter);
+			polygon.addPoint(xCenter, yCenter - d3);
 		}
 	}
 	

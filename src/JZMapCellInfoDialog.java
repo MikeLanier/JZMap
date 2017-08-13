@@ -58,7 +58,12 @@ class JZMapCellInfoDialog extends Stage
 		//          Stuff in room
 
 		Canvas preview = new Canvas(200,200);
-		_previewCell = new JZMapCell(preview, 0, 0);
+		if((cell.xIndex()&0x1)==0) {
+			_previewCell = new JZMapCell(preview, 0, 0);
+		}
+		else {
+			_previewCell = new JZMapCell(preview, 1, 1);
+		}
 		_previewCell.copy(cell);
 
 		// a vertical pane for the controls of the dialog

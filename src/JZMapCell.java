@@ -2,6 +2,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -161,47 +162,75 @@ class JZMapCell
 		return _polygon.isPtInRect(x-_mapCenterX,y-_mapCenterY);
 	}
 
-	private void UpdatePaths(GraphicsContext gc, JZMapPolygon range)
+	private void UpdatePaths(GraphicsContext gc)
 	{
+		Rectangle rect = _polygon._frame.getBounds();
+
 		gc.setLineDashes(0);
 		gc.setLineWidth(2);
 		gc.setFill(Color.WHITE);
 		gc.setStroke(Color.BLACK);
 
+		double d = _radius * 2 / 3;
+
 		for(Exit exit: exits)
 		{
-//			if(exit == Exit.north)
-//			{
-//				gc.strokeLine(range.CenterPoint().x, range.top, range.CenterPoint().x, range.CenterPoint().y);
-//			}
-//			else if(exit == Exit.south)
-//			{
-//				gc.strokeLine(range.CenterPoint().x, range.bottom, range.CenterPoint().x, range.CenterPoint().y);
-//			}
-//			else if(exit == Exit.east)
-//			{
-//				gc.strokeLine(range.right, range.CenterPoint().y, range.CenterPoint().x, range.CenterPoint().y);
-//			}
-//			else if(exit == Exit.west)
-//			{
-//				gc.strokeLine(range.left, range.CenterPoint().y, range.CenterPoint().x, range.CenterPoint().y);
-//			}
-//			else if(exit == Exit.northwest)
-//			{
-//				gc.strokeLine(range.left, range.top, range.CenterPoint().x, range.CenterPoint().y);
-//			}
-//			else if(exit == Exit.northeast)
-//			{
-//				gc.strokeLine(range.right, range.top, range.CenterPoint().x, range.CenterPoint().y);
-//			}
-//			else if(exit == Exit.southwest)
-//			{
-//				gc.strokeLine(range.left, range.bottom, range.CenterPoint().x, range.CenterPoint().y);
-//			}
-//			else if(exit == Exit.southeast)
-//			{
-//				gc.strokeLine(range.right, range.bottom, range.CenterPoint().x, range.CenterPoint().y);
-//			}
+			if(exit == Exit.north)
+			{
+				gc.strokeLine(	_mapCenterX + rect.getCenterX(),
+								_mapCenterY + rect.getCenterY(),
+								_mapCenterX + rect.getCenterX(),
+								_mapCenterY-_radius + rect.getCenterY());
+			}
+			else if(exit == Exit.south)
+			{
+				gc.strokeLine(	_mapCenterX + rect.getCenterX(),
+								_mapCenterY + rect.getCenterY(),
+								_mapCenterX + rect.getCenterX(),
+								_mapCenterY+_radius + rect.getCenterY());
+			}
+			else if(exit == Exit.east)
+			{
+				gc.strokeLine(	_mapCenterX + rect.getCenterX(),
+								_mapCenterY + rect.getCenterY(),
+								_mapCenterX-_radius + rect.getCenterX(),
+								_mapCenterY + rect.getCenterY());
+			}
+			else if(exit == Exit.west)
+			{
+				gc.strokeLine(	_mapCenterX + rect.getCenterX(),
+								_mapCenterY + rect.getCenterY(),
+								_mapCenterX+_radius + rect.getCenterX(),
+								_mapCenterY + rect.getCenterY());
+			}
+			else if(exit == Exit.northwest)
+			{
+				gc.strokeLine(	_mapCenterX + rect.getCenterX(),
+								_mapCenterY + rect.getCenterY(),
+								_mapCenterX-d + rect.getCenterX(),
+								_mapCenterY-d + rect.getCenterY());
+			}
+			else if(exit == Exit.northeast)
+			{
+				gc.strokeLine(	_mapCenterX + rect.getCenterX(),
+								_mapCenterY + rect.getCenterY(),
+								_mapCenterX+d + rect.getCenterX(),
+								_mapCenterY-d + rect.getCenterY());
+			}
+			else if(exit == Exit.southwest)
+			{
+				gc.strokeLine(	_mapCenterX + rect.getCenterX(),
+								_mapCenterY + rect.getCenterY(),
+								_mapCenterX-d + rect.getCenterX(),
+								_mapCenterY+d + rect.getCenterY());
+			}
+			else if(exit == Exit.southeast)
+			{
+				gc.strokeLine(	_mapCenterX + rect.getCenterX(),
+								_mapCenterY + rect.getCenterY(),
+								_mapCenterX+d + rect.getCenterX(),
+								_mapCenterY+d + rect.getCenterY());
+			}
 		}
 	}
 
@@ -212,7 +241,7 @@ class JZMapCell
 
 	void Update( double mapCenterX, double mapCenterY )
 	{
-//		System.out.println("JZMapCell::Update");
+//		System.out.println("JZMapCell::Update: center: " + mapCenterX + ", " + mapCenterY);
 		_mapCenterX = mapCenterX;
 		_mapCenterY = mapCenterX;
 
@@ -226,14 +255,8 @@ class JZMapCell
 
 			int offset = 20;
 			gc.setFill(Color.GREEN);
-//			gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
-
-//			UpdatePaths(gc,_range);
-
-			gc.setFill(Color.WHITE);
 			gc.setStroke(Color.BLACK);
-//			gc.fillRect(xOrigin+offset,yOrigin+offset,_cellWidth-offset*2,_cellHeight-offset*2);
-//			gc.strokeRect(xOrigin+offset,yOrigin+offset,_cellWidth-offset*2,_cellHeight-offset*2);
+
 			int n = _polygon._frame.npoints;
 			double[] xpoints = new double[9];
 			double[] ypoints = new double[9];
@@ -243,6 +266,19 @@ class JZMapCell
 			}
 
 			gc.fillPolygon( xpoints, ypoints, n );
+
+			gc.setFill(Color.WHITE);
+
+			n = _polygon._room.npoints;
+			for(int i=0; i<n; i++) {
+				xpoints[i] = mapCenterX + (double)_polygon._room.xpoints[i];
+				ypoints[i] = mapCenterY + (double)_polygon._room.ypoints[i];
+			}
+
+			gc.fillPolygon( xpoints, ypoints, n );
+			gc.strokePolygon( xpoints, ypoints, n );
+
+			UpdatePaths(gc);
 		}
 
 		else if(_type == Type.path)
@@ -260,7 +296,7 @@ class JZMapCell
 
 			gc.fillPolygon( xpoints, ypoints, n );
 
-//			UpdatePaths(gc,_range);
+			UpdatePaths(gc);
 		}
 
 		else
