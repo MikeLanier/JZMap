@@ -202,6 +202,9 @@ class JZMap extends HBox
 		cell = new JZMapCell(mapCanvas, 2, 2);				cells.add(cell);
 
 		cell = new JZMapCell(mapCanvas, -1, -1);			cells.add(cell);
+		cell = new JZMapCell(mapCanvas, 1, -1);			cells.add(cell);
+		cell = new JZMapCell(mapCanvas, -1, 1);			cells.add(cell);
+		cell = new JZMapCell(mapCanvas, 1, 1);			cells.add(cell);
 
 		GraphicsContext gc = mapCanvas.getGraphicsContext2D();
 		gc.setFill(Color.AQUA);
@@ -229,7 +232,7 @@ class JZMap extends HBox
 
 	void Update()
 	{
-//		System.out.println("Update");
+		System.out.println("Update");
 		// get cell index range
 		int cellIndexMinX = 0xffff;
 		int cellIndexMinY = 0xffff;
@@ -237,6 +240,7 @@ class JZMap extends HBox
 		int cellIndexMaxY = -0xffff;
 
 		int n = cells.size();
+		System.out.println("cell count: " + n);
 		for(int i=0; i<n; i++)
 		{
 			JZMapCell cell = cells.get(i);
@@ -285,6 +289,7 @@ class JZMap extends HBox
 			JZMapCell cell = cells.get(i);
 			if(cell != null)
 			{
+				System.out.println("   cell: " + cell.xIndex() + ", " + cell.yIndex());
 				cell.Update( offset+canvasWidth/2, offset+canvasHeight/2 ); // x, y, w, h );
 			}
 		}
@@ -354,15 +359,20 @@ class JZMap extends HBox
 
 		if(selected != null)
 		{
-			for(int ix=-2; ix<=2; ix+=2)
+			int[][] stuff = {
+					{ -2, -2 },	{ -2, 0 },	{ -2, 2 },
+					{ 0, -2 },				{ 0, 2 },
+					{ 2, -2 },	{ 2, 0 },	{ 2, 2 },
+					{ -1, -1 },				{ 1, -1 },
+					{ -1, 1 },				{ 1, 1 },
+			};
+			int n = stuff.length;
+			for(int i=0; i<n; i++)
 			{
-				for(int iy=-2; iy<=2; iy+=2)
+				if (find(selected.xIndex()+stuff[i][0], selected.yIndex()+stuff[i][1]) == null)
 				{
-					if (find(selected.xIndex()+ix, selected.yIndex()+iy) == null)
-					{
-						JZMapCell cell = new JZMapCell(mapCanvas, selected.xIndex()+ix, selected.yIndex()+iy);
-						cells.add(cell);
-					}
+					JZMapCell cell = new JZMapCell(mapCanvas, selected.xIndex()+stuff[i][0], selected.yIndex()+stuff[i][1]);
+					cells.add(cell);
 				}
 			}
 
