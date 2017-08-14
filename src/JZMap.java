@@ -20,10 +20,18 @@ class JZMap extends HBox
 	private double canvasHeight = 300;
 	private double canvasWidth = 300;
 	private double canvasBorder = 10.0;
-	private double cellCountX = 3;
-	private double cellCountY = 3;
 
 	private ArrayList<JZMapCell> cells = new ArrayList<JZMapCell>();
+
+	public void CellRadius(double _cellRadius)
+	{
+		cellRadius = _cellRadius;
+	}
+
+	public void CanvasBorder(double _canvasBorder)
+	{
+		canvasBorder = _canvasBorder;
+	}
 
 	private void _save() throws IOException
 	{
