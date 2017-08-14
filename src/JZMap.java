@@ -189,22 +189,24 @@ class JZMap extends HBox
 		mapPane.setPrefSize(width-(int)controlsWidth,height);
 		mapPane.setContent(mapCanvas);
 
-		JZMapCell cell = new JZMapCell(mapCanvas, -2, -2);	cells.add(cell);
-		cell = new JZMapCell(mapCanvas, 0, -2);			cells.add(cell);
-		cell = new JZMapCell(mapCanvas, 2, -2);			cells.add(cell);
+		JZMapCell cell = null;
 
-		cell = new JZMapCell(mapCanvas, -2, 0);			cells.add(cell);
+//		cell = new JZMapCell(mapCanvas, -2, -2);	cells.add(cell);
+//		cell = new JZMapCell(mapCanvas, 0, -2);			cells.add(cell);
+//		cell = new JZMapCell(mapCanvas, 2, -2);			cells.add(cell);
+//
+//		cell = new JZMapCell(mapCanvas, -2, 0);			cells.add(cell);
 		cell = new JZMapCell(mapCanvas, 0, 0);				cells.add(cell);
-		cell = new JZMapCell(mapCanvas, 2, 0);				cells.add(cell);
-
-		cell = new JZMapCell(mapCanvas, -2, 2);			cells.add(cell);
-		cell = new JZMapCell(mapCanvas, 0, 2);				cells.add(cell);
-		cell = new JZMapCell(mapCanvas, 2, 2);				cells.add(cell);
-
-		cell = new JZMapCell(mapCanvas, -1, -1);			cells.add(cell);
-		cell = new JZMapCell(mapCanvas, 1, -1);			cells.add(cell);
-		cell = new JZMapCell(mapCanvas, -1, 1);			cells.add(cell);
-		cell = new JZMapCell(mapCanvas, 1, 1);			cells.add(cell);
+//		cell = new JZMapCell(mapCanvas, 2, 0);				cells.add(cell);
+//
+//		cell = new JZMapCell(mapCanvas, -2, 2);			cells.add(cell);
+//		cell = new JZMapCell(mapCanvas, 0, 2);				cells.add(cell);
+//		cell = new JZMapCell(mapCanvas, 2, 2);				cells.add(cell);
+//
+//		cell = new JZMapCell(mapCanvas, -1, -1);			cells.add(cell);
+//		cell = new JZMapCell(mapCanvas, 1, -1);			cells.add(cell);
+//		cell = new JZMapCell(mapCanvas, -1, 1);			cells.add(cell);
+//		cell = new JZMapCell(mapCanvas, 1, 1);			cells.add(cell);
 
 		GraphicsContext gc = mapCanvas.getGraphicsContext2D();
 		gc.setFill(Color.AQUA);
@@ -259,18 +261,21 @@ class JZMap extends HBox
 		canvasWidth = cellRadius * cellCountX * scale + canvasBorder;
 		canvasHeight = cellRadius * cellCountY * scale + canvasBorder;
 
-//		System.out.println("canvas size: " + canvasWidth + ", " + canvasHeight);
+		System.out.println("canvas size: " + canvasWidth + ", " + canvasHeight);
 
 		mapCanvas.setWidth(canvasWidth);
 		mapCanvas.setHeight(canvasHeight);
 
-		double offset = 0;
+		double xOffset = 0;
+		double yOffset = 0;
 		int r = cellCountX/2;
-//		System.out.println(r);
 		if((r & 0x01) == 0 ) {
-			offset = cellRadius;
+			xOffset = -cellRadius;
 		}
-		System.out.println("offset: " + offset);
+		r = cellCountY/2;
+		if((r & 0x01) == 0 ) {
+			yOffset = -cellRadius;
+		}
 
 		GraphicsContext gc = mapCanvas.getGraphicsContext2D();
 		gc.setFill(Color.WHITE);
@@ -289,8 +294,8 @@ class JZMap extends HBox
 			JZMapCell cell = cells.get(i);
 			if(cell != null)
 			{
-				System.out.println("   cell: " + cell.xIndex() + ", " + cell.yIndex());
-				cell.Update( offset+canvasWidth/2, offset+canvasHeight/2 ); // x, y, w, h );
+//				System.out.println("   cell: " + cell.xIndex() + ", " + cell.yIndex());
+				cell.Update( xOffset+canvasWidth/2, yOffset+canvasHeight/2 ); // x, y, w, h );
 			}
 		}
 	}
@@ -337,6 +342,7 @@ class JZMap extends HBox
 		return null;
 	}
 
+	private boolean _dialogOpen = false;
 	public void OnMouseClicked(MouseEvent value)
 	{
 		System.out.println("OnMouseClicked");
@@ -376,8 +382,11 @@ class JZMap extends HBox
 				}
 			}
 
+			Update();
+			_dialogOpen = true;
 			JZMapCellInfoDialog dialog = new JZMapCellInfoDialog(selected);
 			dialog.showAndWait();
+			_dialogOpen = false;
 
 			Update();
 		}
@@ -385,6 +394,8 @@ class JZMap extends HBox
 
 	public void OnMouseMoved(MouseEvent value)
 	{
+		if(_dialogOpen) return;
+
 //		System.out.println("OnMouseMoved");
 		double x = value.getX();
 		double y = value.getY();
@@ -394,13 +405,14 @@ class JZMap extends HBox
 			JZMapCell cell = cells.get(i);
 			if(cell.isHit(x,y)) {
 				if(!cell.Hovered()) {
-//					System.out.println("isHit: " + cell.xIndex() + ", " + cell.yIndex());
+					System.out.println("isHit: " + cell.xIndex() + ", " + cell.yIndex());
 					cell.Hovered(true);
 					cell.Update();
 				}
 			}
 			else {
 				if(cell.Hovered()) {
+					System.out.println("isHit: " + cell.xIndex() + ", " + cell.yIndex());
 					cell.Hovered(false);
 					cell.Update();
 				}

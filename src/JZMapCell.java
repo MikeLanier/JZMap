@@ -241,9 +241,9 @@ class JZMapCell
 
 	void Update( double mapCenterX, double mapCenterY )
 	{
-//		System.out.println("JZMapCell::Update: center: " + mapCenterX + ", " + mapCenterY);
+		System.out.println("JZMapCell::Update: center: " + mapCenterX + ", " + mapCenterY);
 		_mapCenterX = mapCenterX;
-		_mapCenterY = mapCenterX;
+		_mapCenterY = mapCenterY;
 
 		GraphicsContext gc = m_parent.getGraphicsContext2D();
 		gc.setFill(Color.AQUA);
