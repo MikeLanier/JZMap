@@ -58,12 +58,7 @@ class JZMapCellInfoDialog extends Stage
 		//          Stuff in room
 
 		Canvas preview = new Canvas(200,200);
-		if((cell.xIndex()&0x1)==0) {
-			_previewCell = new JZMapCell(preview, 0, 0);
-		}
-		else {
-			_previewCell = new JZMapCell(preview, 1, 1);
-		}
+		_previewCell = new JZMapCell(preview, 0, 0);
 		_previewCell.copy(cell);
 
 		// a vertical pane for the controls of the dialog
@@ -101,7 +96,7 @@ class JZMapCellInfoDialog extends Stage
 							_roomControls.setVisible(true);
 							_path.setSelected(false);
 							_previewCell.type(JZMapCell.Type.room);
-							_previewCell.Update(60, 60);
+							_previewCell.Update(0, 0, 200, 200 );
 						}
 					});
 
@@ -116,13 +111,13 @@ class JZMapCellInfoDialog extends Stage
 							_roomControls.setVisible(false);
 							_room.setSelected(false);
 							_previewCell.type(JZMapCell.Type.path);
-							_previewCell.Update(60, 60);
+							_previewCell.Update(0, 0, 200, 200 );
 						}
 					});
 				}
 
 				cellType.getChildren().add(preview);
-				_previewCell.Update(60, 60);
+				_previewCell.Update(0, 0, 200, 200 );
 			}
 
 			// controls for defineing the paths in and out of the cell
@@ -148,7 +143,7 @@ class JZMapCellInfoDialog extends Stage
 						public void handle(MouseEvent event)
 						{
 							_previewCell.ToggleExit(JZMapCell.Exit.north, _northBox.isSelected());
-							_previewCell.Update(60, 60);
+							_previewCell.Update(0, 0, 200, 200 );
 						}
 					});
 
@@ -159,7 +154,7 @@ class JZMapCellInfoDialog extends Stage
 						public void handle(MouseEvent event)
 						{
 							_previewCell.ToggleExit(JZMapCell.Exit.south, _southBox.isSelected());
-							_previewCell.Update(60, 60);
+							_previewCell.Update(0, 0, 200, 200 );
 						}
 					});
 
@@ -170,7 +165,7 @@ class JZMapCellInfoDialog extends Stage
 						public void handle(MouseEvent event)
 						{
 							_previewCell.ToggleExit(JZMapCell.Exit.east, _eastBox.isSelected());
-							_previewCell.Update(60, 60);
+							_previewCell.Update(0, 0, 200, 200 );
 						}
 					});
 
@@ -181,7 +176,7 @@ class JZMapCellInfoDialog extends Stage
 						public void handle(MouseEvent event)
 						{
 							_previewCell.ToggleExit(JZMapCell.Exit.west, _westBox.isSelected());
-							_previewCell.Update(60, 60);
+							_previewCell.Update(0, 0, 200, 200 );
 						}
 					});
 
@@ -192,7 +187,7 @@ class JZMapCellInfoDialog extends Stage
 						public void handle(MouseEvent event)
 						{
 							_previewCell.ToggleExit(JZMapCell.Exit.northeast, _northeastBox.isSelected());
-							_previewCell.Update(60, 60);
+							_previewCell.Update(0, 0, 200, 200 );
 						}
 					});
 
@@ -203,7 +198,7 @@ class JZMapCellInfoDialog extends Stage
 						public void handle(MouseEvent event)
 						{
 							_previewCell.ToggleExit(JZMapCell.Exit.northwest, _northwestBox.isSelected());
-							_previewCell.Update(60, 60);
+							_previewCell.Update(0, 0, 200, 200 );
 						}
 					});
 
@@ -214,7 +209,7 @@ class JZMapCellInfoDialog extends Stage
 						public void handle(MouseEvent event)
 						{
 							_previewCell.ToggleExit(JZMapCell.Exit.southeast, _southeastBox.isSelected());
-							_previewCell.Update(60, 60);
+							_previewCell.Update(0, 0, 200, 200 );
 						}
 					});
 
@@ -225,7 +220,7 @@ class JZMapCellInfoDialog extends Stage
 						public void handle(MouseEvent event)
 						{
 							_previewCell.ToggleExit(JZMapCell.Exit.southwest, _southwestBox.isSelected());
-							_previewCell.Update(60, 60);
+							_previewCell.Update(0, 0, 200, 200 );
 						}
 					});
 
@@ -236,7 +231,7 @@ class JZMapCellInfoDialog extends Stage
 						public void handle(MouseEvent event)
 						{
 							_previewCell.ToggleExit(JZMapCell.Exit.up, _upBox.isSelected());
-							_previewCell.Update(60, 60);
+							_previewCell.Update(0, 0, 200, 200 );
 						}
 					});
 
@@ -247,7 +242,7 @@ class JZMapCellInfoDialog extends Stage
 						public void handle(MouseEvent event)
 						{
 							_previewCell.ToggleExit(JZMapCell.Exit.down, _downBox.isSelected());
-							_previewCell.Update(60, 60);
+							_previewCell.Update(0, 0, 200, 200 );
 						}
 					});
 				}

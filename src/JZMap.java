@@ -16,22 +16,15 @@ class JZMap extends HBox
 {
 	private Canvas mapCanvas = null;
 	private double scale = 1.0;
-	private double cellRadius = 60.0;
+	private double cellHeight = 100;
+	private double cellWidth = 100;
 	private double canvasHeight = 300;
 	private double canvasWidth = 300;
-	private double canvasBorder = 10.0;
+	private double canvasBorder = 10;
+	private double cellCountX = 3;
+	private double cellCountY = 3;
 
 	private ArrayList<JZMapCell> cells = new ArrayList<JZMapCell>();
-
-	public void CellRadius(double _cellRadius)
-	{
-		cellRadius = _cellRadius;
-	}
-
-	public void CanvasBorder(double _canvasBorder)
-	{
-		canvasBorder = _canvasBorder;
-	}
 
 	private void _save() throws IOException
 	{
@@ -197,24 +190,17 @@ class JZMap extends HBox
 		mapPane.setPrefSize(width-(int)controlsWidth,height);
 		mapPane.setContent(mapCanvas);
 
-		JZMapCell cell = null;
+		JZMapCell cell = new JZMapCell(mapCanvas, -1, -1);	cells.add(cell);
+		cell = new JZMapCell(mapCanvas, 0, -1);			cells.add(cell);
+		cell = new JZMapCell(mapCanvas, 1, -1);			cells.add(cell);
 
-//		cell = new JZMapCell(mapCanvas, -2, -2);	cells.add(cell);
-//		cell = new JZMapCell(mapCanvas, 0, -2);			cells.add(cell);
-//		cell = new JZMapCell(mapCanvas, 2, -2);			cells.add(cell);
-//
-//		cell = new JZMapCell(mapCanvas, -2, 0);			cells.add(cell);
+		cell = new JZMapCell(mapCanvas, -1, 0);			cells.add(cell);
 		cell = new JZMapCell(mapCanvas, 0, 0);				cells.add(cell);
-//		cell = new JZMapCell(mapCanvas, 2, 0);				cells.add(cell);
-//
-//		cell = new JZMapCell(mapCanvas, -2, 2);			cells.add(cell);
-//		cell = new JZMapCell(mapCanvas, 0, 2);				cells.add(cell);
-//		cell = new JZMapCell(mapCanvas, 2, 2);				cells.add(cell);
-//
-//		cell = new JZMapCell(mapCanvas, -1, -1);			cells.add(cell);
-//		cell = new JZMapCell(mapCanvas, 1, -1);			cells.add(cell);
-//		cell = new JZMapCell(mapCanvas, -1, 1);			cells.add(cell);
-//		cell = new JZMapCell(mapCanvas, 1, 1);			cells.add(cell);
+		cell = new JZMapCell(mapCanvas, 1, 0);				cells.add(cell);
+
+		cell = new JZMapCell(mapCanvas, -1, 1);			cells.add(cell);
+		cell = new JZMapCell(mapCanvas, 0, 1);				cells.add(cell);
+		cell = new JZMapCell(mapCanvas, 1, 1);				cells.add(cell);
 
 		GraphicsContext gc = mapCanvas.getGraphicsContext2D();
 		gc.setFill(Color.AQUA);
@@ -250,7 +236,6 @@ class JZMap extends HBox
 		int cellIndexMaxY = -0xffff;
 
 		int n = cells.size();
-		System.out.println("cell count: " + n);
 		for(int i=0; i<n; i++)
 		{
 			JZMapCell cell = cells.get(i);
@@ -260,30 +245,18 @@ class JZMap extends HBox
 			if(cell.yIndex() < cellIndexMinY)	cellIndexMinY = cell.yIndex();
 		}
 
-		int cellCountX = cellIndexMaxX - cellIndexMinX + 2;
-		int cellCountY = cellIndexMaxY - cellIndexMinY + 2;
-		System.out.println("count: " + cellCountX + ", " + cellCountY);
+		int cellCountX = cellIndexMaxX - cellIndexMinX + 1;
+		int cellCountY = cellIndexMaxY - cellIndexMinY + 1;
 
 		System.out.println("cellCount: " + cellCountX + ", " + cellCountY);
 
-		canvasWidth = cellRadius * cellCountX * scale + canvasBorder;
-		canvasHeight = cellRadius * cellCountY * scale + canvasBorder;
+		canvasWidth = cellWidth * cellCountX * scale + canvasBorder;
+		canvasHeight = cellHeight * cellCountY * scale + canvasBorder;
 
 		System.out.println("canvas size: " + canvasWidth + ", " + canvasHeight);
 
 		mapCanvas.setWidth(canvasWidth);
 		mapCanvas.setHeight(canvasHeight);
-
-		double xOffset = 0;
-		double yOffset = 0;
-		int r = cellCountX/2;
-		if((r & 0x01) == 0 ) {
-			xOffset = -cellRadius;
-		}
-		r = cellCountY/2;
-		if((r & 0x01) == 0 ) {
-			yOffset = -cellRadius;
-		}
 
 		GraphicsContext gc = mapCanvas.getGraphicsContext2D();
 		gc.setFill(Color.WHITE);
@@ -302,8 +275,14 @@ class JZMap extends HBox
 			JZMapCell cell = cells.get(i);
 			if(cell != null)
 			{
-//				System.out.println("   cell: " + cell.xIndex() + ", " + cell.yIndex());
-				cell.Update( xOffset+canvasWidth/2, yOffset+canvasHeight/2 ); // x, y, w, h );
+				double w = cellWidth * scale;
+				double h = cellHeight * scale;
+//				System.out.println("cellIndexMin: " + cellIndexMinX + ", " + cellIndexMinY);
+//				System.out.println("cellIndex: " + cell.xIndex() + ", " + cell.yIndex());
+				double x = canvasBorder/2 + (cell.xIndex() - cellIndexMinX) * w;
+				double y = canvasBorder/2 + (cell.yIndex() - cellIndexMinY) * h;
+//				System.out.println( "x, y: " + x + ", " + y);
+				cell.Update( x, y, w, h );
 			}
 		}
 	}
@@ -350,7 +329,6 @@ class JZMap extends HBox
 		return null;
 	}
 
-	private boolean _dialogOpen = false;
 	public void OnMouseClicked(MouseEvent value)
 	{
 		System.out.println("OnMouseClicked");
@@ -373,28 +351,20 @@ class JZMap extends HBox
 
 		if(selected != null)
 		{
-			int[][] stuff = {
-					{ -2, -2 },	{ -2, 0 },	{ -2, 2 },
-					{ 0, -2 },				{ 0, 2 },
-					{ 2, -2 },	{ 2, 0 },	{ 2, 2 },
-					{ -1, -1 },				{ 1, -1 },
-					{ -1, 1 },				{ 1, 1 },
-			};
-			int n = stuff.length;
-			for(int i=0; i<n; i++)
+			for(int ix=-1; ix<=1; ix++)
 			{
-				if (find(selected.xIndex()+stuff[i][0], selected.yIndex()+stuff[i][1]) == null)
+				for(int iy=-1; iy<=1; iy++)
 				{
-					JZMapCell cell = new JZMapCell(mapCanvas, selected.xIndex()+stuff[i][0], selected.yIndex()+stuff[i][1]);
-					cells.add(cell);
+					if (find(selected.xIndex()+ix, selected.yIndex()+iy) == null)
+					{
+						JZMapCell cell = new JZMapCell(mapCanvas, selected.xIndex()+ix, selected.yIndex()+iy);
+						cells.add(cell);
+					}
 				}
 			}
 
-			Update();
-			_dialogOpen = true;
 			JZMapCellInfoDialog dialog = new JZMapCellInfoDialog(selected);
 			dialog.showAndWait();
-			_dialogOpen = false;
 
 			Update();
 		}
@@ -402,29 +372,17 @@ class JZMap extends HBox
 
 	public void OnMouseMoved(MouseEvent value)
 	{
-		if(_dialogOpen) return;
-
-//		System.out.println("OnMouseMoved");
+		//System.out.println("OnMouseMoved");
 		double x = value.getX();
 		double y = value.getY();
 
 		for(int i=0; i<cells.size(); i++)
 		{
 			JZMapCell cell = cells.get(i);
-			if(cell.isHit(x,y)) {
-				if(!cell.Hovered()) {
-					System.out.println("isHit: " + cell.xIndex() + ", " + cell.yIndex());
-					cell.Hovered(true);
-					cell.Update();
-				}
-			}
-			else {
-				if(cell.Hovered()) {
-					System.out.println("isHit: " + cell.xIndex() + ", " + cell.yIndex());
-					cell.Hovered(false);
-					cell.Update();
-				}
-			}
+			if(cell.isHit(x,y))
+				cell.Hovered(true);
+			else
+				cell.Hovered(false);
 		}
 	}
 
