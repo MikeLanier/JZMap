@@ -38,6 +38,19 @@ class JZMapCell
 		path,
 	}
 
+	static int Merge_northeast	= 0x1;
+	static int Merge_northwest	= 0x2;
+	static int Merge_southeast	= 0x4;
+	static int Merge_southwest	= 0x8;
+
+	public enum Merge
+	{
+		northeast,
+		southeast,
+		southwest,
+		northwest,
+	}
+
 	private Type _type = Type.undefined;
 	Type type() { return _type; }
 	void type(Type t) { _type = t; }
@@ -77,6 +90,28 @@ class JZMapCell
 		return false;
 	}
 
+	private int merge_directions = 0;
+	void ToggleMerge(int merge_direction, Boolean on)
+	{
+		if((merge_directions & merge_direction) == 0)
+		{
+			merge_directions |= merge_direction;
+		}
+		else
+		{
+			merge_directions &= ~merge_direction;
+		}
+	}
+
+	Boolean hasMerge(int merge_direction)
+	{
+		if((merge_directions & merge_direction) == 0)
+			return false;
+		else
+			return true;
+	}
+
+
 	private JZMapRect _range = new JZMapRect();
 
 	private static double	_cellWidth = 100;
@@ -95,6 +130,8 @@ class JZMapCell
 		{
 			exits.add(c.exits.get(i));
 		}
+
+		merge_directions = c.merge_directions;
 	}
 
 	void Hovered(Boolean hovered)
@@ -140,7 +177,7 @@ class JZMapCell
 		return _range.isPtInRect(x,y);
 	}
 
-	private void UpdatePaths(GraphicsContext gc, JZMapRect range)
+	private void DrawPaths(GraphicsContext gc, JZMapRect range)
 	{
 		gc.setLineDashes(0);
 		gc.setLineWidth(2);
@@ -184,20 +221,43 @@ class JZMapCell
 		}
 	}
 
-//	void Update(int xIndex, int yIndex) {
-//		if (m_parent != null) {
-//			double width = m_parent.getWidth();
-//			double height = m_parent.getHeight();
-//
-//			double xCenter = width / 2;
-//			double yCenter = height / 2;
-//
-//			double xOrigin = xCenter - _cellWidth / 2 + xIndex * _cellWidth;
-//			double yOrigin = yCenter - _cellHeight / 2 + yIndex * _cellHeight;
-//
-//			Update( xOrigin, yOrigin, _cellWidth, _cellHeight );
-//		}
-//	}
+	private void DrawRoom(GraphicsContext gc, double xOrigin, double yOrigin ) {
+		gc.setLineDashes(0);
+		gc.setLineWidth(2);
+
+		int offset = 20;
+		gc.setFill(Color.GREEN);
+		gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
+
+		DrawPaths(gc,_range);
+
+		gc.setFill(Color.WHITE);
+		gc.setStroke(Color.BLACK);
+
+		System.out.println(merge_directions);
+		if(merge_directions == 0) {
+			gc.fillRect(xOrigin + offset, yOrigin + offset, _cellWidth - offset * 2, _cellHeight - offset * 2);
+			gc.strokeRect(xOrigin + offset, yOrigin + offset, _cellWidth - offset * 2, _cellHeight - offset * 2);
+		}
+
+		else {
+			if((merge_directions & 0x1) != 0) {	// northeast
+				gc.fillRect(xOrigin + offset, yOrigin, _cellWidth - offset, _cellHeight - offset);
+			}
+
+			if((merge_directions & 0x2) != 0) {	// northwest
+				gc.fillRect(xOrigin , yOrigin, _cellWidth - offset, _cellHeight - offset);
+			}
+
+			if((merge_directions & 0x4) != 0) {	// southeast
+				gc.fillRect(xOrigin + offset, yOrigin + offset, _cellWidth - offset, _cellHeight - offset);
+			}
+
+			if((merge_directions & 0x8) != 0) {	// southwest
+				gc.fillRect(xOrigin , yOrigin + offset, _cellWidth - offset, _cellHeight - offset);
+			}
+		}
+	}
 
 	private void Update()
 	{
@@ -207,56 +267,44 @@ class JZMapCell
 	void Update( double xOrigin, double yOrigin, double width, double height )
 	{
 //		System.out.println("Update: " + xOrigin + ", " + yOrigin + ", " + width + ", " + height);
+
+		_cellWidth = width;
+		_cellHeight = height;
+
+		_range = new JZMapRect(new JZMapPoint(xOrigin,yOrigin), new JZMapSize(_cellWidth,_cellHeight));
+
+		GraphicsContext gc = m_parent.getGraphicsContext2D();
+		gc.setFill(Color.AQUA);
+
+		if(_type == Type.room)
 		{
-			_cellWidth = width;
-			_cellHeight = height;
-
-			_range = new JZMapRect(new JZMapPoint(xOrigin,yOrigin), new JZMapSize(_cellWidth,_cellHeight));
-
-			GraphicsContext gc = m_parent.getGraphicsContext2D();
-			gc.setFill(Color.AQUA);
-
-			if(_type == Type.room)
-			{
-				gc.setLineDashes(0);
-				gc.setLineWidth(2);
-
-				int offset = 20;
-				gc.setFill(Color.GREEN);
-				gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
-
-				UpdatePaths(gc,_range);
-
-				gc.setFill(Color.WHITE);
-				gc.setStroke(Color.BLACK);
-				gc.fillRect(xOrigin+offset,yOrigin+offset,_cellWidth-offset*2,_cellHeight-offset*2);
-				gc.strokeRect(xOrigin+offset,yOrigin+offset,_cellWidth-offset*2,_cellHeight-offset*2);
-			}
-
-			else if(_type == Type.path)
-			{
-				gc.setLineDashes(0);
-				gc.setFill(Color.GREEN);
-				gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
-
-				UpdatePaths(gc,_range);
-			}
-
-			else
-			{
-				if(_bSelected)
-					gc.setStroke(Color.RED);
-				else if(_bHovered)
-					gc.setStroke(Color.ORANGE);
-				else
-					gc.setStroke(Color.BLACK);
-
-				gc.setLineDashes(6, 6);
-				gc.setLineWidth(1);
-
-				gc.strokeRoundRect(xOrigin + 10, yOrigin + 10, _cellWidth - 20, _cellHeight - 20, 5, 5);
-			}
+			DrawRoom(gc, xOrigin, yOrigin);
 		}
+
+		else if(_type == Type.path)
+		{
+			gc.setLineDashes(0);
+			gc.setFill(Color.GREEN);
+			gc.fillRect(xOrigin,yOrigin,_cellWidth,_cellHeight);
+
+			DrawPaths(gc,_range);
+		}
+
+		else
+		{
+			if(_bSelected)
+				gc.setStroke(Color.RED);
+			else if(_bHovered)
+				gc.setStroke(Color.ORANGE);
+			else
+				gc.setStroke(Color.BLACK);
+
+			gc.setLineDashes(6, 6);
+			gc.setLineWidth(1);
+
+			gc.strokeRoundRect(xOrigin + 10, yOrigin + 10, _cellWidth - 20, _cellHeight - 20, 5, 5);
+		}
+
 	}
 
 	void save(BufferedWriter out) throws IOException
@@ -267,6 +315,7 @@ class JZMapCell
 			out.write(Integer.toString(_xIndex)+",");
 			out.write(Integer.toString(_yIndex)+",");
 			out.write(_type.toString()+",");
+			out.write(Integer.toString(merge_directions)+",");
 
 			int n = exits.size();
 			out.write(Integer.toString(n)+",");
@@ -306,20 +355,21 @@ class JZMapCell
 					break;
 			}
 
-			int n = Integer.parseInt(items[4]);
+			merge_directions = Integer.parseInt(items[4]);
+			int n = Integer.parseInt(items[5]);
 			for(int i=0; i<n; i++)
 			{
 				Exit exit = Exit.down;
-				if(items[5+i].equals("north"))	exit = Exit.north;
-				if(items[5+i].equals("south"))	exit = Exit.south;
-				if(items[5+i].equals("east"))	exit = Exit.east;
-				if(items[5+i].equals("west"))	exit = Exit.west;
-				if(items[5+i].equals("northeast"))	exit = Exit.northeast;
-				if(items[5+i].equals("northwest"))	exit = Exit.northwest;
-				if(items[5+i].equals("southeast"))	exit = Exit.southeast;
-				if(items[5+i].equals("southwest"))	exit = Exit.southwest;
-				if(items[5+i].equals("up"))	exit = Exit.up;
-				if(items[5+i].equals("down"))	exit = Exit.down;
+				if(items[6+i].equals("north"))	exit = Exit.north;
+				if(items[6+i].equals("south"))	exit = Exit.south;
+				if(items[6+i].equals("east"))	exit = Exit.east;
+				if(items[6+i].equals("west"))	exit = Exit.west;
+				if(items[6+i].equals("northeast"))	exit = Exit.northeast;
+				if(items[6+i].equals("northwest"))	exit = Exit.northwest;
+				if(items[6+i].equals("southeast"))	exit = Exit.southeast;
+				if(items[6+i].equals("southwest"))	exit = Exit.southwest;
+				if(items[6+i].equals("up"))	exit = Exit.up;
+				if(items[6+i].equals("down"))	exit = Exit.down;
 
 				exits.add(exit);
 			}

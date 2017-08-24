@@ -13,6 +13,7 @@ class JZMapCellInfoDialog extends Stage
 {
 	private JZMapCell _previewCell = null;
 	private HBox _pathPane = new HBox();
+	private HBox _mergePane = new HBox();
 	private HBox _roomControls = new HBox();
 	private CheckBox _room = new CheckBox("Room");
 	private CheckBox _path = new CheckBox("Path");
@@ -26,6 +27,11 @@ class JZMapCellInfoDialog extends Stage
 	private CheckBox _southwestBox = new CheckBox("Southwest");
 	private CheckBox _upBox = new CheckBox("Up");
 	private CheckBox _downBox = new CheckBox("Down");
+
+	private CheckBox _mergeNortheast = new CheckBox("Northeast");
+	private CheckBox _mergeNorthwest = new CheckBox("Northwest");
+	private CheckBox _mergeSoutheast = new CheckBox("Southeast");
+	private CheckBox _mergeSouthwest = new CheckBox("Southwest");
 
 	JZMapCellInfoDialog(JZMapCell cell)
 	{
@@ -52,6 +58,8 @@ class JZMapCellInfoDialog extends Stage
 		//      Path enter/exit
 		//          north, south, east, west, northeast, northwest, southeast, southwest, up, down
 		//          one way, two way
+		//      Merge
+		//          northeast, northwest, southeast, southwest
 		//      Room
 		//          Name
 		//          Description
@@ -93,6 +101,7 @@ class JZMapCellInfoDialog extends Stage
 						public void handle(MouseEvent event)
 						{
 							_pathPane.setVisible(true);
+							_mergePane.setVisible(true);
 							_roomControls.setVisible(true);
 							_path.setSelected(false);
 							_previewCell.type(JZMapCell.Type.room);
@@ -108,6 +117,7 @@ class JZMapCellInfoDialog extends Stage
 						public void handle(MouseEvent event)
 						{
 							_pathPane.setVisible(true);
+							_mergePane.setVisible(true);
 							_roomControls.setVisible(false);
 							_room.setSelected(false);
 							_previewCell.type(JZMapCell.Type.path);
@@ -285,6 +295,66 @@ class JZMapCellInfoDialog extends Stage
 				}
 			}
 
+			pane.getChildren().add(_mergePane);
+			{
+				Label mergePaneLabel = new Label("Merge");
+				mergePaneLabel.setPadding(new Insets(12, 12, 12, 12));
+				_mergePane.getChildren().add(mergePaneLabel);
+
+				// check boxes for the different paths; north, south, east, west, northeast, northwest,
+				// southeast, southwest, up and down
+				VBox merge = new VBox();
+				merge.setPadding(new Insets(12, 12, 12, 12));
+				_mergePane.getChildren().add(merge);
+
+				{
+
+					merge.getChildren().add(_mergeNortheast);
+					_mergeNortheast.setOnMouseClicked(new EventHandler<MouseEvent>()
+					{
+						@Override
+						public void handle(MouseEvent event)
+						{
+							_previewCell.ToggleMerge(JZMapCell.Merge_northeast, _mergeNortheast.isSelected());
+							_previewCell.Update(0, 0, 200, 200 );
+						}
+					});
+
+					merge.getChildren().add(_mergeNorthwest);
+					_mergeNorthwest.setOnMouseClicked(new EventHandler<MouseEvent>()
+					{
+						@Override
+						public void handle(MouseEvent event)
+						{
+							_previewCell.ToggleMerge(JZMapCell.Merge_northwest, _mergeNorthwest.isSelected());
+							_previewCell.Update(0, 0, 200, 200 );
+						}
+					});
+
+					merge.getChildren().add(_mergeSoutheast);
+					_mergeSoutheast.setOnMouseClicked(new EventHandler<MouseEvent>()
+					{
+						@Override
+						public void handle(MouseEvent event)
+						{
+							_previewCell.ToggleMerge(JZMapCell.Merge_southeast, _mergeSoutheast.isSelected());
+							_previewCell.Update(0, 0, 200, 200 );
+						}
+					});
+
+					merge.getChildren().add(_mergeSouthwest);
+					_mergeSouthwest.setOnMouseClicked(new EventHandler<MouseEvent>()
+					{
+						@Override
+						public void handle(MouseEvent event)
+						{
+							_previewCell.ToggleMerge(JZMapCell.Merge_southwest, _mergeSouthwest.isSelected());
+							_previewCell.Update(0, 0, 200, 200 );
+						}
+					});
+				}
+
+			}
 			// controls for the room info
 			pane.getChildren().add(_roomControls);
 
@@ -329,6 +399,7 @@ class JZMapCellInfoDialog extends Stage
 			}
 		}
 
+		_mergePane.setVisible(false);
 		_pathPane.setVisible(false);
 		_roomControls.setVisible(false);
 		if(_previewCell.type() == JZMapCell.Type.path)
@@ -341,6 +412,7 @@ class JZMapCellInfoDialog extends Stage
 		{
 			_room.setSelected(true);
 			_pathPane.setVisible(true);
+			_mergePane.setVisible(true);
 			_roomControls.setVisible(true);
 		}
 
@@ -355,6 +427,10 @@ class JZMapCellInfoDialog extends Stage
 		if(_previewCell.hasExit(JZMapCell.Exit.up))		_upBox.setSelected(true);
 		if(_previewCell.hasExit(JZMapCell.Exit.down))	_downBox.setSelected(true);
 
+		if(_previewCell.hasMerge(JZMapCell.Merge_northeast))	_mergeNortheast.setSelected(true);
+		if(_previewCell.hasMerge(JZMapCell.Merge_northwest))	_mergeNorthwest.setSelected(true);
+		if(_previewCell.hasMerge(JZMapCell.Merge_southeast))	_mergeSoutheast.setSelected(true);
+		if(_previewCell.hasMerge(JZMapCell.Merge_southwest))	_mergeSouthwest.setSelected(true);
 		Scene scene = new Scene(pane);
 		setScene(scene);
 	}

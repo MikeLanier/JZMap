@@ -1,15 +1,10 @@
-// TODO   [ ] Convert Cells to Octagons and Diamonds
-// TODO       [ ] Octagons can be paths or rooms
-// TODO       [ ] Diamonds are paths only. They fill in gaps which are NE, NW, SE and SW of an octagon
-// TODO       [ ] Rather than origin, width, and height. A cell will be defined by center and radius.
-// TODO           [ ] Radius of a diamond will be 1/3 the radius of an octagon
-// TODO       [ ] The x/y index of a cell will be even for octagons and odd for diamonds
+// TODO   [ ] Merge Cells
+// TODO       [ ] Add option to cell dialog to select merge direction.  Multiple cells drawn to look like one cell
+// TODO       [ ] How to draw text on merged cells?
 // TODO   [-] Zoom In/Out
 // TODO       [x] Buttons for zoom +/-
 // TODO       [ ] Zoom using scroll wheel
 // TODO       [ ] Zoom using slider
-// TODO   [x] Size of frame and size of map not connected
-// TODO       [x] border around the map
 // TODO   [ ] When add cells,
 // TODO       [x] center all on map
 // TODO       [x] resize map so all fit.
